@@ -1,5 +1,7 @@
-#include <Windows.h>
+п»ї#include <Windows.h>
 #include "resource.h"
+
+CONST CHAR invitation[] = "Р’РІРµРґРёС‚Рµ РёРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ";
 
 BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -19,7 +21,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, IN
 
 	//); //MB_YESNO, MB_YESNOCANCEL);
 	////MB - Message Box
-	DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_DIALOG1), NULL,(DLGPROC)DlgProc, 0);
+	DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_DIALOG1), NULL, (DLGPROC)DlgProc, 0);
 	return 0;
 }
 
@@ -27,35 +29,49 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
-	case WM_INITDIALOG: //Выполняется один раз при запуске окна.
+	case WM_INITDIALOG: //Р’С‹РїРѕР»РЅСЏРµС‚СЃСЏ РѕРґРёРЅ СЂР°Р· РїСЂРё Р·Р°РїСѓСЃРєРµ РѕРєРЅР°.
 	{
-		HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON1)); //Загружаем иконку в handler
-		SendMessage(hwnd, WM_SETICON, 0, (LPARAM)hIcon); //Отправляем иконку на диалоговое окно
-		//SetFocus(GetDlgItem(hwnd, IDC_EDIT_LOGIN)); //Установка курсора в поле IDC_EDIT_LOGIN
+		HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON1)); //Р—Р°РіСЂСѓР¶Р°РµРј РёРєРѕРЅРєСѓ РІ handler
+		SendMessage(hwnd, WM_SETICON, 0, (LPARAM)hIcon); //РћС‚РїСЂР°РІР»СЏРµРј РёРєРѕРЅРєСѓ РЅР° РґРёР°Р»РѕРіРѕРІРѕРµ РѕРєРЅРѕ
+		//SetFocus(GetDlgItem(hwnd, IDC_EDIT_LOGIN)); //РЈСЃС‚Р°РЅРѕРІРєР° РєСѓСЂСЃРѕСЂР° РІ РїРѕР»Рµ IDC_EDIT_LOGIN
+		HWND hEditLogin = GetDlgItem(hwnd, IDC_EDIT_LOGIN);
+		SendMessage(hEditLogin, WM_SETTEXT, 0, (LPARAM)invitation);
 	}
-		break;
-	case WM_COMMAND: //Обрабатывает команды с клавиатуры и мыши.
+	break;
+	case WM_COMMAND: //РћР±СЂР°Р±Р°С‚С‹РІР°РµС‚ РєРѕРјР°РЅРґС‹ СЃ РєР»Р°РІРёР°С‚СѓСЂС‹ Рё РјС‹С€Рё.
 		switch (LOWORD(wParam))
 		{
-		case IDC_BUTTON_COPY:
+		case IDC_EDIT_LOGIN:
 		{
 			CONST INT SIZE = 256;
-			CHAR sz_buffer[SIZE] = {};
+			CHAR sz_buffer[SIZE]{};
+			HWND hEditLogin = GetDlgItem(hwnd, IDC_EDIT_LOGIN);
+			SendMessage(hEditLogin, WM_GETTEXT, SIZE, (LPARAM)sz_buffer);
+	
+			if (HIWORD(wParam) == EN_SETFOCUS && strcmp(sz_buffer, invitation) == 0) SendMessage(hEditLogin, WM_SETTEXT, 0, (LPARAM)"");
+
+			if (HIWORD(wParam) == EN_KILLFOCUS && strlen(sz_buffer) == 0) SendMessage(hEditLogin, WM_SETTEXT, 0, (LPARAM)invitation);
+		}
+		break;
+		case IDC_BUTTON_COPY:
+		{
 			HWND hEditLogin = GetDlgItem(hwnd, IDC_EDIT_LOGIN);
 			HWND hEditPassword = GetDlgItem(hwnd, IDC_EDIT_PASSWORD);
+			CONST INT SIZE = 256;
+			CHAR sz_buffer[SIZE] = {};
 			SendMessage(hEditLogin, WM_GETTEXT, SIZE, (LPARAM)sz_buffer);
 			SendMessage(hEditPassword, WM_SETTEXT, 0, (LPARAM)sz_buffer);
 		}
-			break;
+		break;
 		case IDOK:
-			MessageBox(NULL, "Была нажата кнопка 'OK'", "Info", MB_OK | MB_ICONINFORMATION);
+			MessageBox(NULL, "Р‘С‹Р»Р° РЅР°Р¶Р°С‚Р° РєРЅРѕРїРєР° 'OK'", "Info", MB_OK | MB_ICONINFORMATION);
 			break;
 		case IDCANCEL:
 			EndDialog(hwnd, 0);
 			break;
 		}
 		break;
-	case WM_CLOSE: //Выполняется при нажатии кнопки 'Х'.
+	case WM_CLOSE: //Р’С‹РїРѕР»РЅСЏРµС‚СЃСЏ РїСЂРё РЅР°Р¶Р°С‚РёРё РєРЅРѕРїРєРё 'РҐ'.
 		EndDialog(hwnd, 0);
 	}
 	return FALSE;
