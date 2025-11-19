@@ -53,7 +53,7 @@ BOOL CALLBACK DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				//Для использования без предупреждений пришлось добавить _CRT_SECURE_NO_WARNINGS в свойствах проекта
 				//C/C++/Preprocessor/Preprocessor Definition/_CRT_SECURE_NO_WARNINGS <different options>
 				//Write formatted data to a string.
-				sprintf(sz_answer, "Выбран элемент \"%s\", номер %d", sz_buffer, i); //Используем С-шную функцию для помещения
+				wsprintf(sz_answer, "Выбран элемент \"%s\", номер %d", sz_buffer, i); //Используем С-шную функцию для помещения
 				//в сообщение текста, номера элемента и содержимого элемента
 
 				//Вывожу окончательный результат на экран
