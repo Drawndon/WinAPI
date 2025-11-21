@@ -1,7 +1,7 @@
-//ListBox
-#define _CRT_SECURE_NO_WARNINGS	//для sprintf()
+п»ї//ListBox
+#define _CRT_SECURE_NO_WARNINGS	//РґР»СЏ sprintf()
 #include<Windows.h>
-#include<cstdio>	//для sprintf()
+#include<cstdio>	//РґР»СЏ sprintf()
 #include"resource.h"
 
 CONST CHAR* string[] =
@@ -42,13 +42,13 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case IDOK:
 		{
 			CONST INT SIZE = 256;
-			CHAR sz_buffer[SIZE] = {};	//в эту строку мы скопируем выделенную строку ListBox.
-			CHAR sz_message[SIZE] = {};	//этy строку мы будем отображать в MessageBox.
+			CHAR sz_buffer[SIZE] = {};	//РІ СЌС‚Сѓ СЃС‚СЂРѕРєСѓ РјС‹ СЃРєРѕРїРёСЂСѓРµРј РІС‹РґРµР»РµРЅРЅСѓСЋ СЃС‚СЂРѕРєСѓ ListBox.
+			CHAR sz_message[SIZE] = {};	//СЌС‚y СЃС‚СЂРѕРєСѓ РјС‹ Р±СѓРґРµРј РѕС‚РѕР±СЂР°Р¶Р°С‚СЊ РІ MessageBox.
 
 			HWND hListBox = GetDlgItem(hwnd, IDC_LIST1);
 			int index = SendMessage(hListBox, LB_GETCURSEL, 0, 0);
 			SendMessage(hListBox, LB_GETTEXT, index, (LPARAM)sz_buffer);
-			sprintf(sz_message, "Выбран элемент \"%s\", номер %d.", sz_buffer, index);
+			sprintf(sz_message, "Р’С‹Р±СЂР°РЅ СЌР»РµРјРµРЅС‚ \"%s\", РЅРѕРјРµСЂ %d.", sz_buffer, index);
 			
 			MessageBox(hwnd, sz_message, "Info", MB_OK | MB_ICONINFORMATION | MB_HELP);
 		}
