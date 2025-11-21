@@ -39,6 +39,16 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_COMMAND:	
 		switch (LOWORD(wParam))
 		{
+		case IDC_ADD:
+			break;
+		case IDC_DELETE:
+		{
+			HWND hListBox = GetDlgItem(hwnd, IDC_LIST1);
+			INT i = SendMessage(hListBox, LB_GETCURSEL, 0, 0);
+			SendMessage(hListBox, LB_DELETESTRING, i, 0);
+
+		}
+			break;
 		case IDOK:
 		{
 			CONST INT SIZE = 256;
