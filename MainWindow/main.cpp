@@ -1,5 +1,6 @@
 ﻿//MainWindow
 #include<Windows.h>
+#include "resource.h"
 
 
 CONST CHAR g_sz_WINDOW_CLASS[] = "My first window";
@@ -19,9 +20,25 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, IN
 	wClass.cbWndExtra = 0;
 
 	//Инициализируем внешний вид окон:
-	wClass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-	wClass.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
-	wClass.hCursor = LoadCursor(NULL, IDC_ARROW);
+	//Загружает иконку статически (вкомпиливает в приложение)
+	wClass.hIconSm = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON_BITCOIN));
+	wClass.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON_PALM));
+	//Загружает иконку динамически
+	//wClass.hIconSm = (HICON)LoadImage(hInstance /*можно NULL*/, "bitcoin.ico", IMAGE_ICON, LR_DEFAULTSIZE, LR_DEFAULTSIZE, LR_LOADFROMFILE);//Sm - small
+	//wClass.hIcon = (HICON)LoadImage(hInstance /*можно NULL*/, "palm.ico", IMAGE_ICON, LR_DEFAULTSIZE, LR_DEFAULTSIZE, LR_LOADFROMFILE);
+
+	//Сделали свой ресурс для курсора, нарисовали его сами в ресурсе
+	//wClass.hCursor = LoadCursor(hInstance, MAKEINTRESOURCE(IDC_CURSOR1));
+	//Сделали изображение из Интернета
+	wClass.hCursor = (HCURSOR)LoadImage
+	(
+		hInstance,
+		"starcraft-original\\Working In Background.ani",
+		IMAGE_CURSOR,
+		LR_DEFAULTSIZE,
+		LR_DEFAULTSIZE,
+		LR_LOADFROMFILE
+	);
 	wClass.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 
 	//Инициализация системных переменных
@@ -46,10 +63,10 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, IN
 		g_sz_WINDOW_CLASS,	//Заголовок окна
 		WS_OVERLAPPEDWINDOW, //Стиль окна. Стили всегда зависят от класса окна WS_OVERLAPPEDWINDOW - главное окно
 		CW_USEDEFAULT, CW_USEDEFAULT, //Position
-		CW_USEDEFAULT, CW_USEDEFAULT, //Размер окна
+		640, 480, //Размер окна (можно CW_USEDEFAULT, CW_USEDEFAULT,)
 		NULL,
 		NULL, //Для главного окна это ResourceID главного меню,
-				//для дочернего окна (Control) - ResourceID дочернего окна (IDC_BUTTON_COPY), например
+		//для дочернего окна (Control) - ResourceID дочернего окна (IDC_BUTTON_COPY), например
 		hInstance,
 		NULL
 	);
@@ -58,15 +75,18 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, IN
 		MessageBox(NULL, "Windows creation failed", NULL, MB_OK | MB_ICONERROR);
 		return 0;
 	}
-	ShowWindow(hwnd, nCmdShow);
-	UpdateWindow(hwnd);
+	ShowWindow(hwnd, nCmdShow); //Задает режим отображения окна - Развернуто на весь экран, свернуто в окно, свернуто на панель задач
+	UpdateWindow(hwnd); //Обновляет рабочую область окна, отправляя сообщение 'WM_PAINT', если клиентская область не пустая
 
 
 	//3) Запуск цикла сообщений:
-
-
-
-	return 0;
+	MSG msg;
+	while (GetMessage(&msg, NULL, 0, 0) > 0)
+	{
+		TranslateMessage(&msg);//Преобразует сообщения виртуальных клавиш в символьное сообщение 
+		DispatchMessage(&msg); //Отправляет сообщение в процедуру окна
+	}
+	return msg.wParam; //https://learn.microsoft
 }
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
