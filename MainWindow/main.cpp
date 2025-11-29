@@ -56,14 +56,23 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, IN
 
 
 	//2) Создание окна:
+	INT screen_width = GetSystemMetrics(SM_CXSCREEN);
+	INT screen_height = GetSystemMetrics(SM_CYSCREEN);
+
+	INT window_width = screen_width * 0.75;
+	INT window_height = screen_height * 0.75;
+
+	INT window_start_x = screen_width / 8;
+	INT window_start_y = screen_height / 8;
+
 	HWND hwnd = CreateWindowEx
 	(
 		NULL,	//exStyle
 		g_sz_WINDOW_CLASS,	//Имя класса окна
 		g_sz_WINDOW_CLASS,	//Заголовок окна
 		WS_OVERLAPPEDWINDOW, //Стиль окна. Стили всегда зависят от класса окна WS_OVERLAPPEDWINDOW - главное окно
-		CW_USEDEFAULT, CW_USEDEFAULT, //Position
-		640, 480, //Размер окна (можно CW_USEDEFAULT, CW_USEDEFAULT,)
+		window_start_x, window_start_y, //CW_USEDEFAULT, CW_USEDEFAULT, //Position
+		window_width, window_height, //640, 480, //Размер окна (можно CW_USEDEFAULT, CW_USEDEFAULT,)
 		NULL,
 		NULL, //Для главного окна это ResourceID главного меню,
 		//для дочернего окна (Control) - ResourceID дочернего окна (IDC_BUTTON_COPY), например
@@ -95,6 +104,25 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_CREATE:
 		break;
+	case WM_MOVE:
+	case WM_SIZE:
+	{
+		RECT window_rect;
+		GetWindowRect(hwnd, &window_rect);
+		INT window_width = window_rect.right - window_rect.left;
+		INT window_height = window_rect.bottom - window_rect.top;
+		CONST INT SIZE = 256;
+		CHAR sz_buffer[SIZE]{};
+		wsprintf
+		(
+			sz_buffer, "%s. Положение: %ix%i; Размер: %ix%i",
+			g_sz_WINDOW_CLASS,
+			window_rect.left, window_rect.top,
+			window_width, window_height
+		);
+		SendMessage(hwnd, WM_SETTEXT, 0, (LPARAM)sz_buffer);
+	}
+	break;
 	case WM_COMMAND:
 		break;
 	case WM_DESTROY:
