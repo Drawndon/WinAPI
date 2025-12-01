@@ -3,7 +3,7 @@
 #include "resource.h"
 
 
-CONST CHAR g_sz_WINDOW_CLASS[] = "My first window";
+CONST CHAR g_sz_WINDOW_CLASS[] = "Мое первое окно";
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -56,14 +56,14 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, IN
 
 
 	//2) Создание окна:
-	INT screen_width = GetSystemMetrics(SM_CXSCREEN);
-	INT screen_height = GetSystemMetrics(SM_CYSCREEN);
+	INT scr_width = GetSystemMetrics(SM_CXSCREEN);
+	INT scr_height = GetSystemMetrics(SM_CYSCREEN);
 
-	INT window_width = screen_width * 0.75;
-	INT window_height = screen_height * 0.75;
+	INT wnd_width = scr_width * 0.75;
+	INT wnd_height = scr_height * 0.75;
 
-	INT window_start_x = screen_width / 8;
-	INT window_start_y = screen_height / 8;
+	INT wnd_start_x = scr_width / 8;
+	INT wnd_start_y = scr_height / 8;
 
 	HWND hwnd = CreateWindowEx
 	(
@@ -71,8 +71,8 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, IN
 		g_sz_WINDOW_CLASS,	//Имя класса окна
 		g_sz_WINDOW_CLASS,	//Заголовок окна
 		WS_OVERLAPPEDWINDOW, //Стиль окна. Стили всегда зависят от класса окна WS_OVERLAPPEDWINDOW - главное окно
-		window_start_x, window_start_y, //CW_USEDEFAULT, CW_USEDEFAULT, //Position
-		window_width, window_height, //640, 480, //Размер окна (можно CW_USEDEFAULT, CW_USEDEFAULT,)
+		wnd_start_x, wnd_start_y, //CW_USEDEFAULT, CW_USEDEFAULT, //Position
+		wnd_width, wnd_height, //640, 480, //Размер окна (можно CW_USEDEFAULT, CW_USEDEFAULT,)
 		NULL,
 		NULL, //Для главного окна это ResourceID главного меню,
 		//для дочернего окна (Control) - ResourceID дочернего окна (IDC_BUTTON_COPY), например
@@ -100,25 +100,27 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, IN
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+
 	switch (uMsg)
 	{
 	case WM_CREATE:
 		break;
+	
 	case WM_MOVE:
 	case WM_SIZE:
 	{
-		RECT window_rect;
-		GetWindowRect(hwnd, &window_rect);
-		INT window_width = window_rect.right - window_rect.left;
-		INT window_height = window_rect.bottom - window_rect.top;
+		RECT wnd_rect;
+		GetWindowRect(hwnd, &wnd_rect);
+		INT wnd_width = wnd_rect.right - wnd_rect.left;
+		INT wnd_height = wnd_rect.bottom - wnd_rect.top;
 		CONST INT SIZE = 256;
 		CHAR sz_buffer[SIZE]{};
 		wsprintf
 		(
-			sz_buffer, "%s. Положение: %ix%i; Размер: %ix%i",
+			sz_buffer, "%s. Положение: x = %i  y = %i; Размер: %i на %i",
 			g_sz_WINDOW_CLASS,
-			window_rect.left, window_rect.top,
-			window_width, window_height
+			wnd_rect.left, wnd_rect.top,
+			wnd_width, wnd_height
 		);
 		SendMessage(hwnd, WM_SETTEXT, 0, (LPARAM)sz_buffer);
 	}
