@@ -2,6 +2,8 @@
 #include<Windows.h>
 #include "resource.h"
 
+#define IDC_BUTTON 1000 //ОП
+
 
 CONST CHAR g_sz_WINDOW_CLASS[] = "Мое первое окно";
 
@@ -104,6 +106,26 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	switch (uMsg)
 	{
 	case WM_CREATE:
+		//MessageBox(hwnd, "Cursor check", "Info", MB_OK | MB_ICONINFORMATION); 
+	{
+
+		HWND hButton = CreateWindowEx
+		(
+			NULL, //exStyle
+			"Button", //Class
+			"Кнопка", //Title
+			WS_CHILD | WS_VISIBLE, //Style
+			10, 10, //Position
+			150, 80, //Size
+			hwnd, //Parent
+			(HMENU)IDC_BUTTON, //Для главного окна - это ResourceID главного меню,
+						//для дочернего окна (элемента упрввления окна) - это ResourceID дочернего элемента, 1000 мы взяли от балды,
+						//так ResourceID это обычное число
+
+			GetModuleHandle(NULL), //hInstance
+			NULL //?????????
+		);
+	}
 		break;
 	
 	case WM_MOVE:
@@ -126,6 +148,14 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 	break;
 	case WM_COMMAND:
+	{
+		switch (LOWORD(wParam))
+		{
+		case IDC_BUTTON:
+			MessageBox(hwnd, "Cursor check", "Info", MB_OK | MB_ICONINFORMATION);
+			break;
+		}
+	}
 		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
