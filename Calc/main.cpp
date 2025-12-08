@@ -212,14 +212,25 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	break;
 	case WM_COMMAND:
 	{
+		static DOUBLE a = DBL_MIN, b = DBL_MIN;//Операнды
+		static INT operation = 0; //IDC ресурсы int, поэтому INT
+		static BOOL input = FALSE; //Срабатывает при нажатии цифр
+		static BOOL input_operation = FALSE;
+
 		SetFocus(hwnd); //Клава не перестает работать
 		HWND hEdit = GetDlgItem(hwnd, IDC_DISPLAY);
 		CONST INT SIZE = 256;
 		CHAR sz_buffer[SIZE] = {};
+		CHAR sz_digit[2] = {};
 		SendMessage(hEdit, WM_GETTEXT, SIZE, (LPARAM)sz_buffer); //прочитали в буфер
 		if (LOWORD(wParam) >= IDC_BUTTON_0 && LOWORD(wParam) <= IDC_BUTTON_9)
 		{
-			CHAR sz_digit[2] = {};
+			if (input_operation)
+			{
+				//SendMessage(hEdit, WM_SETTEXT, 0, (LPARAM)"");
+				sz_buffer[0] = 0;
+				input_operation = FALSE;
+			}
 			sz_digit[0] = LOWORD(wParam) - IDC_BUTTON_0 + '0';
 			if (strcmp(sz_buffer, "0") == 0) strcpy(sz_buffer, sz_digit);
 			else strcat(sz_buffer, sz_digit); //String concatenation
@@ -227,6 +238,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			//dst - Destination (Строка получатель)
 			//src - Source (Строка источник)
 			SendMessage(hEdit, WM_SETTEXT, 0, (LPARAM)sz_buffer);
+			input = TRUE;
+			input_operation = FALSE;
 
 		}
 		if (LOWORD(wParam) == IDC_BUTTON_POINT)
@@ -242,7 +255,41 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		if (LOWORD(wParam) == IDC_BUTTON_CLR)
 		{
+			a = b = DBL_MIN;
+			operation = 0;
+			input = input_operation = FALSE;
 			SendMessage(hEdit, WM_SETTEXT, 0, (LPARAM)"0");
+		}
+		if (LOWORD(wParam) >= IDC_BUTTON_PLUS && LOWORD(wParam) <= IDC_BUTTON_SLASH)
+		{
+			if (input)
+			{
+				if (a == DBL_MIN) a = atof(sz_buffer);
+				else b = atof(sz_buffer);
+				input = FALSE;
+				SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_EQUAL), 0); //Сначала выполняем старую операцию
+			}
+			operation = LOWORD(wParam); //Затем сохраняем новую
+			input_operation = TRUE;
+		}
+		if (LOWORD(wParam) == IDC_BUTTON_EQUAL)
+		{
+			if (input)
+			{
+				if (a == DBL_MIN) a = atof(sz_buffer);
+				else b = atof(sz_buffer);
+				input = FALSE;
+			}
+			switch (operation)
+			{
+			case IDC_BUTTON_PLUS: a += b; break;
+			case IDC_BUTTON_MINUS: a -= b; break;
+			case IDC_BUTTON_ASTER: a *= b; break;
+			case IDC_BUTTON_SLASH: a /= b; break;
+			}
+			input_operation = FALSE;
+			sprintf(sz_buffer, "%g", a);
+			SendMessage(hEdit, WM_SETTEXT, 0, (LPARAM)sz_buffer);
 		}
 	}
 	break;
@@ -254,7 +301,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			SendMessage(GetDlgItem(hwnd, wParam - '0' + IDC_BUTTON_0), BM_SETSTATE, TRUE, 0); //Зажимает кнопки
 		else if (wParam >= 0x60 && wParam <= 0x69)
 			SendMessage(GetDlgItem(hwnd, wParam - 0x60 + IDC_BUTTON_0), BM_SETSTATE, TRUE, 0); //Зажимает кнопки
-		
+
 		switch (wParam)
 		{
 		case VK_OEM_PLUS: //'+' в верхнем ряду клавиатуры
@@ -270,13 +317,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case VK_MULTIPLY:
 			SendMessage(GetDlgItem(hwnd, IDC_BUTTON_ASTER), BM_SETSTATE, TRUE, 0);
 			break;
-		
+
 		case VK_OEM_2:
 		case VK_DIVIDE:
 			SendMessage(GetDlgItem(hwnd, IDC_BUTTON_SLASH), BM_SETSTATE, TRUE, 0);
 			break;
-		
-		
+
+
 		case VK_DECIMAL:
 		case VK_OEM_PERIOD:
 			SendMessage(GetDlgItem(hwnd, IDC_BUTTON_POINT), BM_SETSTATE, TRUE, 0);
@@ -317,45 +364,45 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 		case VK_OEM_PLUS: //'+' в верхнем ряду клавиатуры
 		case VK_ADD: /*'+' на NumPad*/
-			SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_PLUS),0);
+			SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_PLUS), 0);
 			SendMessage(GetDlgItem(hwnd, IDC_BUTTON_PLUS), BM_SETSTATE, FALSE, 0);
 			break;
 
 		case VK_OEM_MINUS://'-' в верхнем ряду клавиатуры
 		case VK_SUBTRACT: /*'-' на NumPad*/
-			SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_MINUS),0);
+			SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_MINUS), 0);
 			SendMessage(GetDlgItem(hwnd, IDC_BUTTON_MINUS), BM_SETSTATE, FALSE, 0);
 			break;
 
 		case VK_MULTIPLY:
-			SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_ASTER),0);
+			SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_ASTER), 0);
 			SendMessage(GetDlgItem(hwnd, IDC_BUTTON_ASTER), BM_SETSTATE, FALSE, 0);
 			break;
 
 		case VK_OEM_2:
 		case VK_DIVIDE:
-			SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_SLASH),0);
+			SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_SLASH), 0);
 			SendMessage(GetDlgItem(hwnd, IDC_BUTTON_SLASH), BM_SETSTATE, FALSE, 0);
 			break;
 
 		case VK_DECIMAL:
 		case VK_OEM_PERIOD:
-			SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_POINT),0);
+			SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_POINT), 0);
 			SendMessage(GetDlgItem(hwnd, IDC_BUTTON_POINT), BM_SETSTATE, FALSE, 0);
 			break;
 
 		case VK_BACK:
-			SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_BSP),0);
+			SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_BSP), 0);
 			SendMessage(GetDlgItem(hwnd, IDC_BUTTON_BSP), BM_SETSTATE, FALSE, 0);
 			break; //Отжимает кнопки
 
 		case VK_ESCAPE:
-			SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_CLR),0);
+			SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_CLR), 0);
 			SendMessage(GetDlgItem(hwnd, IDC_BUTTON_CLR), BM_SETSTATE, FALSE, 0);
 			break; //Отжимает кнопки
 
 		case VK_RETURN:
-			SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_EQUAL),0);
+			SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_EQUAL), 0);
 			SendMessage(GetDlgItem(hwnd, IDC_BUTTON_EQUAL), BM_SETSTATE, FALSE, 0);
 			break; //Отжимает кнопки
 		}
