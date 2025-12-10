@@ -312,7 +312,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			}
 			input_operation = FALSE;
 			sprintf(sz_buffer, "%f", a);
-			for (int i = strlen(sz_buffer) - 1; sz_buffer[i] == '0' || sz_buffer[i] == '.'; sz_buffer[i--] = 0);
+			//for (int i = strlen(sz_buffer) - 1; sz_buffer[i] == '0' || sz_buffer[i] == '.'; sz_buffer[i--] = 0);
 			SendMessage(hEdit, WM_SETTEXT, 0, (LPARAM)sz_buffer);
 		}
 	}
@@ -432,6 +432,31 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 	}
 	break;
+	case WM_CONTEXTMENU:
+	{
+		HMENU cmMain = CreatePopupMenu();
+		AppendMenu(cmMain, MF_STRING, IDM_SQUARE_BLUE, "Square blue");
+		AppendMenu(cmMain, MF_STRING, IDM_METAL_MISTRAL, "Metal mistral");
+		AppendMenu(cmMain, MF_SEPARATOR, NULL, NULL);
+		AppendMenu(cmMain, MF_STRING, IDM_EXIT, "Exit");
+		BOOL selected_item = TrackPopupMenuEx
+		(
+			cmMain,
+			TPM_RIGHTALIGN | TPM_BOTTOMALIGN | TPM_RETURNCMD | TPM_RIGHTBUTTON | TPM_VERNEGANIMATION,
+			LOWORD(lParam), HIWORD(lParam), //Появляется там, где указатель мыши
+			//0, //Reserved
+			hwnd,
+			NULL
+		);
+		switch (selected_item)
+		{
+		case IDM_SQUARE_BLUE:	SetSkin(hwnd, "square_blue");		break;
+		case IDM_METAL_MISTRAL: SetSkin(hwnd, "metal_mistral");		break;
+		case IDM_EXIT:			SendMessage(hwnd, WM_CLOSE, 0, 0);	break;
+		}
+		DestroyMenu(cmMain);
+	}
+	break;
 	case WM_DESTROY:
 		FreeConsole();
 		PostQuitMessage(0); //Отправляет сообщение окну о выходе
@@ -448,10 +473,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 VOID SetSkin(HWND hwnd, CONST CHAR  skin[])
 {
 	CHAR sz_filename[FILENAME_MAX] = {}; //FILENAME_MAX - системная константа 260
-	for (int i = 0; i < 10; i++)
+	for (int i = IDC_BUTTON_0; i <= IDC_BUTTON_EQUAL; i++)
 	{
 		sprintf(sz_filename, "ButtonsBMP\\%s\\button_%i.bmp", skin, i);
-		HWND hButton = GetDlgItem(hwnd, IDC_BUTTON_0 + i);
+		HWND hButton = GetDlgItem(hwnd, i);
 		HBITMAP bmpButton = (HBITMAP)LoadImage
 		(
 			GetModuleHandle(NULL),
