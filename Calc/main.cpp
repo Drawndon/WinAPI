@@ -2,7 +2,8 @@
 #include <Windows.h>
 #include<iostream>
 #include "resource.h"
-#include"Definitions.h"
+#include"Dimensions.h"
+#include "ColorsAndSkins.h"
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 

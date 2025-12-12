@@ -126,7 +126,8 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Definitions.h" />
+    <ClInclude Include="ColorsAndSkins.h" />
+    <ClInclude Include="Dimensions.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>

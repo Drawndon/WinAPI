@@ -23,7 +23,10 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Definitions.h">
+    <ClInclude Include="Dimensions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ColorsAndSkins.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
