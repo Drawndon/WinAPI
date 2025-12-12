@@ -78,7 +78,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		AllocConsole(); //открывает консоль
 		freopen("CONOUT$", "w", stdout); // чтобы работать в норм кодировке
-		CreateWindowEx
+		HWND hEdit = CreateWindowEx //Сохранили в hEdit
 		(
 			NULL,
 			"Edit",
@@ -91,6 +91,23 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			GetModuleHandle(NULL), //hInstance
 			NULL
 		);
+		AddFontResourceEx("Fonts\\digital-7.ttf", FR_PRIVATE, 0); //Загрузили шрифт из файла
+		HFONT hFont = CreateFont
+		(
+			g_i_FONT_HEIGHT, g_i_FONT_WIDTH,
+			0, 0,
+			FW_BOLD, //BOLD
+			FALSE, //Italic
+			FALSE, //Underline
+			FALSE, //Strikeout
+			DEFAULT_CHARSET,
+			OUT_TT_PRECIS,
+			CLIP_TT_ALWAYS,
+			ANTIALIASED_QUALITY,
+			FF_DONTCARE,
+			"Digital-7"
+		);
+		SendMessage(hEdit, WM_SETFONT, (WPARAM)hFont, TRUE); //Отправили сообщение в hEdit
 		CHAR sz_button[2] = {};
 		for (int i = 6; i >= 0; i -= 3)
 		{
