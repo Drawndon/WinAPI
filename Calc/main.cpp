@@ -108,6 +108,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			"Digital-7"
 		);
 		SendMessage(hEdit, WM_SETFONT, (WPARAM)hFont, TRUE); //Отправили сообщение в hEdit
+
 		CHAR sz_button[2] = {};
 		for (int i = 6; i >= 0; i -= 3)
 		{
@@ -216,6 +217,18 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		SetSkin(hwnd, "square_blue");
 	}
 	break;
+	case WM_CTLCOLOREDIT: //Сообщение передается всегда, когда EditControl не read-only и не disabled
+	{
+		HDC hdc = (HDC)wParam; //С сообщением WM_CTLCOLREDIT в 'wParam' принимается HDC элемента EditControl
+		SetBkMode(hdc, TRANSPARENT); //Делаем фон hEdit непрозрачным
+		SetBkColor(hdc, RGB(0, 0, 100));
+		SetTextColor(hdc, RGB(255, 0, 0));
+		HBRUSH hBrush = CreateSolidBrush(RGB(0, 0, 150));
+		SetClassLongPtr(hwnd, GCLP_HBRBACKGROUND, (LONG_PTR)hBrush);
+		SendMessage(hwnd, WM_ERASEBKGND, wParam, 0);
+		return (LRESULT)hBrush;
+	}
+		break;
 	case WM_COMMAND:
 	{
 		static DOUBLE a = DBL_MIN, b = DBL_MIN;//Операнды
