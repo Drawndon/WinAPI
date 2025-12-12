@@ -2,31 +2,7 @@
 #include <Windows.h>
 #include<iostream>
 #include "resource.h"
-
-CONST CHAR g_sz_WINDOW_CLASS[] = "Calc PV_521";
-
-CONST INT g_i_BUTTON_SIZE = 50;
-CONST INT g_i_INTERVAL = 1;
-CONST INT g_i_DISPLAY_INTERVAL = 10;
-CONST INT g_i_DOUBLE_BUTTON_SIZE = g_i_BUTTON_SIZE * 2 + g_i_INTERVAL;
-CONST INT g_i_DISPLAY_WIDTH = g_i_BUTTON_SIZE * 5 + g_i_INTERVAL * 4;
-CONST INT g_i_DISPLAY_HEIGHT = 22;
-CONST INT g_i_START_X = 10;
-CONST INT g_i_START_Y = 10;
-CONST INT g_i_BUTTON_START_X = g_i_START_X;
-CONST INT g_i_BUTTON_START_Y = g_i_START_Y + g_i_DISPLAY_HEIGHT + g_i_DISPLAY_INTERVAL;
-
-CONST INT g_i_WINDOW_WIDTH = g_i_DISPLAY_WIDTH + g_i_START_X * 2 + 16;
-CONST INT g_i_WINDOW_HEIGHT = g_i_DISPLAY_HEIGHT + g_i_START_Y + (g_i_BUTTON_SIZE + g_i_INTERVAL) * 4 + 48 + g_i_DISPLAY_INTERVAL;
-
-
-#define X_BUTTON_POSITION(position) g_i_BUTTON_START_X + (g_i_BUTTON_SIZE + g_i_INTERVAL) * (position) //position взяли в скобки, чтобы когда будет не одно число, а выражение, то тогда
-//будет вычислено выражение и подставлено
-#define Y_BUTTON_POSITION(position) g_i_BUTTON_START_Y + (g_i_BUTTON_SIZE + g_i_INTERVAL) * (position)
-
-CONST CHAR g_OPERATIONS[] = "+-*/";
-
-
+#include"Definitions.h"
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -312,7 +288,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			}
 			input_operation = FALSE;
 			sprintf(sz_buffer, "%f", a);
-			//for (int i = strlen(sz_buffer) - 1; sz_buffer[i] == '0' || sz_buffer[i] == '.'; sz_buffer[i--] = 0);
+			for (int i = strlen(sz_buffer) - 1; sz_buffer[i] == '0' || sz_buffer[i] == '.'; sz_buffer[i--] = 0); //Убирает лишние нули, если результат целое число
 			SendMessage(hEdit, WM_SETTEXT, 0, (LPARAM)sz_buffer);
 		}
 	}
@@ -473,20 +449,34 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 VOID SetSkin(HWND hwnd, CONST CHAR  skin[])
 {
 	CHAR sz_filename[FILENAME_MAX] = {}; //FILENAME_MAX - системная константа 260
-	for (int i = IDC_BUTTON_0; i <= IDC_BUTTON_EQUAL; i++)
+	for (int i = IDC_BUTTON_0; i <= IDC_BUTTON_9; i++)
 	{
-		sprintf(sz_filename, "ButtonsBMP\\%s\\button_%i.bmp", skin, i);
+		sprintf(sz_filename, "ButtonsBMP\\%s\\button_%i.bmp", skin, i - IDC_BUTTON_0);
 		HWND hButton = GetDlgItem(hwnd, i);
 		HBITMAP bmpButton = (HBITMAP)LoadImage
 		(
 			GetModuleHandle(NULL),
 			sz_filename,
 			IMAGE_BITMAP,
-			i == 0 ? g_i_DOUBLE_BUTTON_SIZE : g_i_BUTTON_SIZE,
+			i == IDC_BUTTON_0 ? g_i_DOUBLE_BUTTON_SIZE : g_i_BUTTON_SIZE,
 			g_i_BUTTON_SIZE,
 			LR_LOADFROMFILE
 		);
-		SendMessage(hButton, BM_SETIMAGE, 0, (LPARAM)bmpButton);
+		SendMessage(hButton, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmpButton);
 	}
-
+	for (int i = IDC_BUTTON_POINT; i <= IDC_BUTTON_EQUAL; i++)
+	{
+		sprintf(sz_filename, "ButtonsBMP\\%s\\button_%s.bmp", skin, g_sz_BTN_FILENAMES[i - IDC_BUTTON_POINT]);
+		HWND hButton = GetDlgItem(hwnd, i);
+		HBITMAP bmpButton = (HBITMAP)LoadImage
+		(
+			GetModuleHandle(NULL),
+			sz_filename,
+			IMAGE_BITMAP,
+			g_i_BUTTON_SIZE,
+			i == IDC_BUTTON_EQUAL ? g_i_DOUBLE_BUTTON_SIZE : g_i_BUTTON_SIZE,
+			LR_LOADFROMFILE
+		);
+		SendMessage(hButton, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmpButton);
+	}
 }
