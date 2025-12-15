@@ -8,6 +8,7 @@
 LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 VOID SetSkin(HWND hwnd, CONST CHAR  skin[]);
+VOID SetSkinFromDLL(HWND hwnd, CONST CHAR  skin[]);
 
 INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, INT nCmdShow)
 {
@@ -216,7 +217,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			GetModuleHandle(NULL),
 			NULL
 		);
-		SetSkin(hwnd, "square_blue");
+		SetSkinFromDLL(hwnd, "square_blue");
 	}
 	break;
 	case WM_CTLCOLOREDIT: //Сообщение передается всегда, когда EditControl не read-only и не disabled
@@ -465,7 +466,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 
 		InvalidateRect(hwnd, 0, TRUE);
-		SetSkin(hwnd, g_sz_SKIN[skinID]);
+		SetSkinFromDLL(hwnd, g_sz_SKIN[skinID]);
 		DestroyMenu(cmMain);
 	}
 	break;
@@ -515,4 +516,23 @@ VOID SetSkin(HWND hwnd, CONST CHAR  skin[])
 		);
 		SendMessage(hButton, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmpButton);
 	}
+}
+
+VOID SetSkinFromDLL(HWND hwnd, CONST CHAR  skin[])
+{
+	HMODULE hSkin = LoadLibraryA(skin);
+	for (int i = IDC_BUTTON_0; i <= IDC_BUTTON_EQUAL; i++)
+	{
+		HBITMAP hBitmap = (HBITMAP)LoadImage
+		(
+			hSkin,
+			MAKEINTRESOURCE(i),
+			IMAGE_BITMAP,
+			i == IDC_BUTTON_0 ? g_i_DOUBLE_BUTTON_SIZE : g_i_BUTTON_SIZE,		//X
+			i == IDC_BUTTON_EQUAL ? g_i_DOUBLE_BUTTON_SIZE : g_i_BUTTON_SIZE,	//Y
+			LR_SHARED //Означает загрузку из разделяемой библиотеки
+		);
+		SendMessage(GetDlgItem(hwnd, i), BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hBitmap);
+	}
+	FreeLibrary(hSkin);
 }
